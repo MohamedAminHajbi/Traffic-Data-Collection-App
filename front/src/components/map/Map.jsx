@@ -6,9 +6,9 @@ import tt from '@tomtom-international/web-sdk-maps';
 function Map() {
   const mapElement = useRef();
 
-  const [mapLongitude, setMapLongitude] = useState(-121.91599);
-  const [mapLatitude, setMapLatitude] = useState(37.36765);
-  const [mapZoom, setMapZoom] = useState(10);
+  const [mapLongitude, setMapLongitude] = useState(0);
+  const [mapLatitude, setMapLatitude] = useState(0);
+  const [mapZoom, setMapZoom] = useState(3);
   const [map, setMap] = useState({});
   const [marker, setMarker] = useState(null);
 
@@ -19,6 +19,7 @@ function Map() {
       center: [mapLongitude, mapLatitude],
       zoom: mapZoom,
     });
+    
 
     const geoControl = new tt.GeolocateControl({
       positionOptions: {
@@ -62,6 +63,7 @@ function Map() {
 
     setMap(mapInstance);
 
+    
     // Clean up on component unmount
     return () => {
       mapInstance.remove();
@@ -73,6 +75,8 @@ function Map() {
 
   return (
     <div className="container">
+
+      <div ref={mapElement} className="mapDiv"></div>
       <input
         type="text"
         name="longitude"
@@ -80,7 +84,7 @@ function Map() {
         className="longitude"
         onChange={(e) => setMapLongitude(e.target.value)}
       />
-      <div ref={mapElement} className="mapDiv"></div>
+      
     </div>
   );
 }

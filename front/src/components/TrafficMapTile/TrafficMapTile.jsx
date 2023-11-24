@@ -5,12 +5,10 @@ const TrafficMapTile = () => {
 
   useEffect(() => {
     const API_KEY = 'LV0YAdniBN99sBdObDGUaPGalGmpRu4R'; // Replace with your actual TomTom API key
-    const tileEndpoint = 'https://api.tomtom.com/traffic/map/4/tile/flow/absolute/12/2044/1360.png';
-
-    // Fetch the traffic map tile
+    const tileEndpoint = 'https://api.tomtom.com/traffic/map/4/tile/flow/absolute/12/2044/1360.png?key=LV0YAdniBN99sBdObDGUaPGalGmpRu4R';
     const fetchTile = async () => {
       try {
-        const response = await fetch(`${tileEndpoint}?key=${API_KEY}`);
+        const response = await fetch(tileEndpoint);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
