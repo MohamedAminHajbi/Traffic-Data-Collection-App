@@ -1,15 +1,15 @@
-.container{
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+.container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Align content at the top */
+  overflow: auto; /* Enable scrolling if content overflows */
 }
-.mapDiv{
-    width: 97%;
-    height: 70vh;
-    margin: 20px;
 
+.mapDiv {
+  height: 90vh; /* Set a specific height for the map */
+  margin: 20px;
 }
 .btn {
     font-size: 17px;
@@ -134,4 +134,69 @@
     50% {
       transform: translateY(calc(-50% - 5px)) scale(1.1);
     }
+  }
+
+
+  .card {
+    position:absolute;
+    width: 500px;
+    height: 254px;
+    border-radius: 4px;
+    background: #fff;
+    display: flex;
+    gap: 5px;
+    padding: .4em;
+    margin: 10px;
+  }
+  
+  .card p {
+    height: 100%;
+    flex: 1;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all .5s;
+    background: #fff;
+    border: 1px solid #0B2447;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  .card p:hover {
+    flex: 6;
+  }
+  
+  .card p span {
+    min-width: 14em;
+    padding: .5em;
+    text-align: center;
+    transform: rotate(-90deg);
+    transition: all .5s;
+    text-transform: uppercase;
+    color: #0B2447;
+    font-weight: 500;
+    letter-spacing: .1em;
+  }
+  
+  .card p:hover span {
+    transform: rotate(0);
+  }
+
+  .detail{
+    display: none;
+    
+  }
+  .card p:hover .detail {
+    display: block;
+    transform: rotate(0);
+  }
+  .infos-container{
+    display: flex;
+    
+    justify-content: center;
+    
+    
+    
   }

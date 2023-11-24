@@ -14,12 +14,20 @@ function Map() {
   const [myLatitude, setMyLatitude] = useState(null);
   const [mapZoom, setMapZoom] = useState(1); // Adjust the initial zoom level as needed
   const [map, setMap] = useState({});
+  const [hoveredIndex, setHoveredIndex] = useState(null);
   const [fetched, setFetched] = useState(false);
   const [marker, setMarker] = useState(null);
   const [flowData, setFlowData] = useState(null);
 
   const [inputLongitude, setInputLongitude] = useState('');
   const [inputLatitude, setInputLatitude] = useState('');
+
+  const handleHover = (index) => {
+    setHoveredIndex(index);
+  };
+  const handleLeave = () => {
+    setHoveredIndex(null);
+  };
 
   const handleGetInfos = async () => {
     
@@ -97,8 +105,7 @@ function Map() {
   return (
     <div className="container">
       <div ref={mapElement} className="mapDiv"></div>
-      <div className="infos-container">
-        <form className="form-infos">
+      <form className="form-infos">
           <div className="inputs">
             <div className="input-container">
               <input
@@ -137,17 +144,19 @@ function Map() {
             Get Infos
           </Link>
         </form>
-
+      <div className="infos-container">
         {flowData && (
-          <div className="flow-data">
-            <p>Current Speed: {flowData.currentSpeed} km/h</p>
-            <p>Free Flow Speed: {flowData.freeFlowSpeed} km/h</p>
-            <p>Current Travel Time: {flowData.currentTravelTime} seconds</p>
-            <p>Free Flow Travel Time: {flowData.freeFlowTravelTime} seconds</p>
-            <p>Confidence: {flowData.confidence}</p>
-            <p>Road Closure: {flowData.roadClosure ? 'Yes' : 'No'}</p>
-          </div>
-        )}
+        <div class="card">
+            <p><span>Current Speed</span><div className='detail'>{flowData.currentSpeed} km/h</div></p>
+            <p><span>Free Flow Speed</span><div className='detail'>{flowData.freeFlowSpeed} km/h</div></p>
+            <p><span>Current Travel Time</span><div className='detail'>{flowData.currentTravelTime} seconds</div></p>
+            <p><span>Free Flow Travel Time</span><div className='detail'>{flowData.freeFlowTravelTime} seconds</div></p>
+            <p><span>Confidence</span><div className='detail'>{flowData.confidence}</div></p>
+            <p><span>Road Closure</span><div className='detail'>{flowData.roadClosure ? 'Yes' : 'No'}</div></p>
+        </div>
+)}
+        
+          
       </div>
     </div>
   );
