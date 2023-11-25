@@ -2,11 +2,20 @@ import React, { useEffect } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-const LeafletMap = ({ routeCoordinates }) => {
+const LeafletMap = () => {
+
+  const convertFlowSegmentData = (flowData) => {
+    const coordinates = flowData.flowSegmentData.coordinates.coordinate;
+    const convertedCoordinates = coordinates.map(coord => [coord.latitude, coord.longitude]);
+    return convertedCoordinates;
+  };
   useEffect(() => {
+    const flowData = JSON.parse(localStorage.getItem('flowData')) ;
+    console.log(flowData);
+    const convertedCoordinates = convertFlowSegmentData(flowData);
+    console.log(convertedCoordinates);
     // Create a map centered at a specific location
     const map = L.map('leaflet-map').setView([37.7749, -122.4194], 13);
-
     // Add a tile layer to the map
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',

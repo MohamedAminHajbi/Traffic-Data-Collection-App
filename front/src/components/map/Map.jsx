@@ -1,25 +1,20 @@
 
-import React, { useState, useEffect, useRef, useHistory } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '@tomtom-international/web-sdk-maps/dist/maps.css';
 import tt from '@tomtom-international/web-sdk-maps';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate } from 'react-router-dom';
 import './Map.css';
 
 function Map() {
   const mapElement = useRef();
-  const history = useHistory();
-  const [mapLongitude, setMapLongitude] = useState(null);
-  const [mapLatitude, setMapLatitude] = useState(null);
+  const navigate = useNavigate();
   const [myLongitude, setMyLongitude] = useState(null);
   const [myLatitude, setMyLatitude] = useState(null);
   const [mapZoom, setMapZoom] = useState(1); // Adjust the initial zoom level as needed
   const [map, setMap] = useState({});
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [fetched, setFetched] = useState(false);
   const [marker, setMarker] = useState(null);
   const [flowData, setFlowData] = useState(null);
   const [roadCordinates, setRoadCordinates] = useState([]);
-
   const [inputLongitude, setInputLongitude] = useState('');
   const [inputLatitude, setInputLatitude] = useState('');
 
@@ -29,41 +24,30 @@ function Map() {
     return convertedCoordinates;
   };
   const handleGetInfos = async () => {
-    
-    // Fetch data from the TomTom Flow Segment Data API
     try {
+      // Fetch data from the TomTom Flow Segment Data API
       const response = await fetch(
         `https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json?key=LV0YAdniBN99sBdObDGUaPGalGmpRu4R&point=${inputLatitude},${inputLongitude}`
       );
-
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
-      setFetched(true);
       const data = await response.json();
-      setFlowData(data.flowSegmentData);
-      console.log(data);
-      const convertedCoordinates = convertFlowSegmentData(flowData);
+      setFlowData(data);
+      // Save data to local storage
+      localStorage.setItem('flowData', JSON.stringify(data));
+      const convertedCoordinates = convertFlowSegmentData(data);
       setRoadCordinates(convertedCoordinates);
-      console.log(convertedCoordinates);
-      history.push({
-        pathname: '/flowData',
-        state: {
-          longitude: inputLongitude,
-          latitude: inputLatitude,
-          // Add more props as needed
-        },
-      });
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
-
+  
   useEffect(() => {
     let mapInstance = tt.map({
       key: 'LV0YAdniBN99sBdObDGUaPGalGmpRu4R',
       container: mapElement.current,
-      center: [mapLongitude, mapLatitude],
+      center: [inputLatitude || 0, inputLongitude || 0],
       zoom: mapZoom,
     });
 
@@ -110,7 +94,7 @@ function Map() {
         marker.remove();
       }
     };
-  }, [mapLongitude, mapLatitude, mapZoom]);
+  }, []);
 
   return (
     <div className="container">
