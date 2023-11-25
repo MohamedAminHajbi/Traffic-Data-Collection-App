@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useHistory } from 'react';
 import '@tomtom-international/web-sdk-maps/dist/maps.css';
 import tt from '@tomtom-international/web-sdk-maps';
 import { Link } from 'react-router-dom';
@@ -7,7 +7,7 @@ import './Map.css';
 
 function Map() {
   const mapElement = useRef();
-
+  const history = useHistory();
   const [mapLongitude, setMapLongitude] = useState(null);
   const [mapLatitude, setMapLatitude] = useState(null);
   const [myLongitude, setMyLongitude] = useState(null);
@@ -18,17 +18,16 @@ function Map() {
   const [fetched, setFetched] = useState(false);
   const [marker, setMarker] = useState(null);
   const [flowData, setFlowData] = useState(null);
+  const [roadCordinates, setRoadCordinates] = useState([]);
 
   const [inputLongitude, setInputLongitude] = useState('');
   const [inputLatitude, setInputLatitude] = useState('');
 
-  const handleHover = (index) => {
-    setHoveredIndex(index);
+  const convertFlowSegmentData = (flowData) => {
+    const coordinates = flowData.coordinates.coordinate;
+    const convertedCoordinates = coordinates.map(coord => [coord.latitude, coord.longitude]);
+    return convertedCoordinates;
   };
-  const handleLeave = () => {
-    setHoveredIndex(null);
-  };
-
   const handleGetInfos = async () => {
     
     // Fetch data from the TomTom Flow Segment Data API
@@ -44,6 +43,17 @@ function Map() {
       const data = await response.json();
       setFlowData(data.flowSegmentData);
       console.log(data);
+      const convertedCoordinates = convertFlowSegmentData(flowData);
+      setRoadCordinates(convertedCoordinates);
+      console.log(convertedCoordinates);
+      history.push({
+        pathname: '/flowData',
+        state: {
+          longitude: inputLongitude,
+          latitude: inputLatitude,
+          // Add more props as needed
+        },
+      });
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -140,7 +150,7 @@ function Map() {
               />
             </div>
           </div>
-          <Link className="btn" onClick={handleGetInfos}>
+          <Link to="/flowData" className="btn" onClick={handleGetInfos}>
             Get Infos
           </Link>
         </form>
