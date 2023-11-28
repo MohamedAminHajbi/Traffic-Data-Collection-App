@@ -83,7 +83,22 @@ function Map() {
         enableHighAccuracy: true,
       },
       trackUserLocation: true,
+      
     });
+    geoControl.on('geolocate', (event) => {
+      console.log('Geolocate event:', event);
+    
+      // Now, check the console output and determine the correct way to access latitude and longitude.
+      // Update the code accordingly.
+      const coords = event.coords;
+      const lat = coords.latitude;
+      const lng = coords.longitude;
+      console.log(coords);
+      console.log(`Current location: ${lat}, ${lng}`);
+      setMyLongitude(lng);
+      setMyLatitude(lat);
+    });
+    
     mapInstance.addControl(geoControl, 'top-left');
 
     setMap(mapInstance);
