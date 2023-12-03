@@ -1,33 +1,50 @@
-// TrafficMap component
-import React from 'react';
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+import React, { useEffect, useState } from 'react';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-const TrafficMap = ({ incidents }) => {
-  const mapCenter = [52.3716625745, 4.8905708978]; // Set the initial map center
+const TrafficMap = () => {
 
-  // Create a GeoJSON feature collection object
-  const geoJsonData = {
-    type: 'FeatureCollection',
-    features: incidents,
+  const convertFlowSegmentData = (data) => {
+    const coordinates = data.routes[0].legs[0].points;
+    const convertedCoordinates = coordinates.map(coord => [coord.latitude, coord.longitude]);
+    return convertedCoordinates;
   };
+  useEffect(() => {
+    const routeData = JSON.parse(localStorage.getItem('routeData')) ;
+    console.log(routeData);
+    const convertedCoordinates = convertFlowSegmentData(routeData);
+    console.log(convertedCoordinates);
+    // Create a map centered at a specific location
+    const map = L.map('leaflet-map').setView([37.7749, -122.4194], 13);
+    // Add a tile layer to the map
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+    }).addTo(map);
 
-  return (
-    <MapContainer center={mapCenter} zoom={13} style={{ height: '500px', width: '100%' }}>
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
+    // Example coordinates for a route
+    
 
-      {/* Check if incidents and coordinates are defined before rendering GeoJSON */}
-      {incidents &&
-        incidents.length &&
-        incidents.map((incident, index) => (
-          incident.geometry && incident.geometry.coordinates ? (
-            <GeoJSON key={index} data={incident} />
-          ) : null
-        ))}
-    </MapContainer>
+    // Draw a polyline on the map using the route coordinates
+    L.polyline(convertedCoordinates, { color: 'blue' }).addTo(map);
+
+    // Add markers at the start and end of the route
+    L.marker(convertedCoordinates[0]).addTo(map);
+    L.marker(convertedCoordinates[convertedCoordinates.length - 1]).addTo(map);
+
+    // Fit the map to the bounds of the route
+    map.fitBounds(convertedCoordinates);
+
+    // Clean up when the component unmounts
+    return () => {
+      map.remove();
+    };
+  }, []);
+
+  return (<div>
+    <div id="leaflet-map" style={{ height: '500px' }}>
+  </div>
+  
+  </div>
   );
 };
 

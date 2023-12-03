@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -22,24 +22,17 @@ const LeafletMap = () => {
     }).addTo(map);
 
     // Example coordinates for a route
-    const routeCoordinates = [
-      [39.492368857312186, 8.966464541099981],
-  [39.491994565480063, 8.967005727063281],
-  [39.491846452849778, 8.967237046340159],
-  [39.491731542361016, 8.967398588099911],
-  [39.491691086391484, 8.967457023560399],
-  [39.491452124312083, 8.967757216895109],
-    ]
+    
 
     // Draw a polyline on the map using the route coordinates
-    L.polyline(routeCoordinates, { color: 'blue' }).addTo(map);
+    L.polyline(convertedCoordinates, { color: 'blue' }).addTo(map);
 
     // Add markers at the start and end of the route
-    L.marker(routeCoordinates[0]).addTo(map);
-    L.marker(routeCoordinates[routeCoordinates.length - 1]).addTo(map);
+    L.marker(convertedCoordinates[0]).addTo(map);
+    L.marker(convertedCoordinates[convertedCoordinates.length - 1]).addTo(map);
 
     // Fit the map to the bounds of the route
-    map.fitBounds(routeCoordinates);
+    map.fitBounds(convertedCoordinates);
 
     // Clean up when the component unmounts
     return () => {
@@ -47,7 +40,12 @@ const LeafletMap = () => {
     };
   }, []);
 
-  return <div id="leaflet-map" style={{ height: '500px' }}></div>;
+  return (<div>
+    <div id="leaflet-map" style={{ height: '500px' }}>
+  </div>
+  
+  </div>
+  );
 };
 
 export default LeafletMap;

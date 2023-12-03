@@ -17,6 +17,7 @@ function App() {
       <Routes>
       <Route path="/" element={<Map/>} />
       <Route path="/flowData" element={<LeafletMap/>} />
+      <Route path="/routing" element={<TrafficMap/>} />
       </Routes>
     </Router>
   );
