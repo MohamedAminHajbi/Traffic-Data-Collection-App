@@ -19,13 +19,16 @@ function Map() {
   const [roadCordinates, setRoadCordinates] = useState([]);
   const [inputLongitude, setInputLongitude] = useState('-3.7440826227505397');
   const [inputLatitude, setInputLatitude] = useState('40.236291071787605');
-  const [endLng, setEndLng] = useState('8.704700948636685');
-  const [startLng, setStartLng] = useState('10.155937110783439');
-  const [endLtd, setEndLtd] = useState('36.14504712200656');
-  const [startLtd, setStartLtd] = useState('36.844180988493804');
+  const [endLng, setEndLng] = useState('-3.7440826227505397');
+  const [startLng, setStartLng] = useState('10.155951734199805');
+  const [endLtd, setEndLtd] = useState('40.236291071787605');
+  const [startLtd, setStartLtd] = useState('36.84419289085466');
   const [routeData, setRouteData] = useState(null);
   const [showLeafletMap, setShowLeafletMap] = useState(false);
-  const [pingTwoPlaces, setPingTwoPlaces] = useState(false);
+  const [pingTwoPlaces, setPingTwoPlaces] = useState(true);
+  const [clickCount, setClickCount] = useState(0);
+  const [markers, setMarkers] = useState([]);
+
 
   const convertFlowSegmentData = (flowData) => {
     const coordinates = flowData.coordinates.coordinate;
@@ -70,31 +73,76 @@ function Map() {
 
     const navControl = new tt.NavigationControl();
     mapInstance.addControl(navControl, 'top-right');
+    if (pingTwoPlaces){
+      mapInstance.on('click', (event) => {
+        const { lng, lat } = event.lngLat;
+      
+        setMarkers((prevMarkers) => {
+          let updatedMarkers;
+      
+          // If there are already two markers, remove the first one
+          if (prevMarkers.length === 2) {
+            prevMarkers[0].remove();
+            updatedMarkers = [prevMarkers[1], new tt.Marker().setLngLat([lng, lat])];
+          } else {
+            // If less than two markers, add a new one
+            updatedMarkers = [...prevMarkers, new tt.Marker().setLngLat([lng, lat])];
+          }
+      
+          console.log('Markers:', updatedMarkers); // Log the current state
 
-    mapInstance.on('click', (event) => {
-      const { lng, lat } = event.lngLat;
-      if (pingTwoPlaces){
-        
-      }else{
+          updatedMarkers.forEach((marker) => {
+            marker.addTo(mapInstance);
+          });
+          if(updatedMarkers.length===1){
+            const coor1 = updatedMarkers[0].getLngLat()
+            console.log(coor1);
+            setStartLng(coor1.lng);
+            setStartLtd(coor1.ltd);
+          }
+          
+          
+          if(updatedMarkers.length===2){
+            const coor1 = updatedMarkers[0].getLngLat()
+            const coor2 = updatedMarkers[1].getLngLat()
+            setStartLng(coor1.lng);
+            setStartLtd(coor1.lat);
+            setEndLng(coor2.lng);
+            setEndLtd(coor2.lat);
+            
+          }
+          return updatedMarkers;
+        });
+      });
+      
+      
+      
+    }else{
+      mapInstance.on('click', (event) => {
+        const { lng, lat } = event.lngLat;
         if (marker) {
           marker.remove();
         }
-  
         const newMarker = new tt.Marker().setLngLat([lng, lat]).addTo(mapInstance);
-  
         setMarker((prevMarker) => {
           if (prevMarker) {
             prevMarker.remove();
           }
           return newMarker;
         });
-        console.log(`Clicked at coordinates: ${lng}, ${lat}`);
-        setInputLatitude(lat);
-        setInputLongitude(lng);
-        localStorage.setItem('inputLat', inputLatitude);
-        localStorage.setItem('inputLng', inputLongitude);
-      }
-    });
+      
+      
+          console.log(`Clicked at coordinates: ${lng}, ${lat}`);
+          setInputLatitude(lat);
+          setInputLongitude(lng);
+          localStorage.setItem('inputLat', inputLatitude);
+          localStorage.setItem('inputLng', inputLongitude);
+        
+      });
+    }
+    
+
+    
 
     const geoControl = new tt.GeolocateControl({
       positionOptions: {
@@ -136,7 +184,6 @@ function Map() {
         const dataRouting = await response.json();
         setRouteData(dataRouting);
 
-        localStorage.setItem('routeData', JSON.stringify(dataRouting));
       } catch (error) {
         console.error('Error fetching route data:', error);
       }
@@ -169,7 +216,7 @@ function Map() {
       <div className="rightPanel">
         <form className="form-infos">
           <div className="inputs">
-            <div className="input-container">
+            {/* <div className="input-container">
               <input
                 type="text"
                 name="text"
@@ -177,10 +224,11 @@ function Map() {
                 placeholder="search..."
               />
               <span className="icon">
-                {/* Your search icon */}
+                
               </span>
-            </div>
+            </div> */}
             <div className="input-container">
+            <label htmlFor="longitudeInput">Longitude:</label>
               <input
                 type="number"
                 name="text"
@@ -191,6 +239,7 @@ function Map() {
               />
             </div>
             <div className="input-container">
+            <label htmlFor="longitudeInput">Longitude:</label>
               <input
                 type="number"
                 name="text"
@@ -200,13 +249,39 @@ function Map() {
                 onChange={(e) => setInputLatitude(e.target.value)}
               />
             </div>
-          </div>
-          <button className="btn" onClick={(e)=>{e.preventDefault(); handleGetInfos(); setShowLeafletMap(true);}}>
+            <button className="btn" onClick={(e)=>{e.preventDefault(); handleGetInfos(); setShowLeafletMap(true);}}>
             Get Traffic
           </button>
-          <button className="btn" onClick={(e)=>{e.preventDefault(); handleGetInfos(); setShowLeafletMap(true);}}>
+          </div>
+          <div className="inputs">
+          <div className="input-container">
+          <label htmlFor="longitudeInput">Longitude:</label>
+              <input
+                type="number"
+                name="text"
+                className="input"
+                placeholder="Longitude"
+                value={inputLongitude}
+                onChange={(e) => setInputLongitude(e.target.value)}
+              />
+            </div>
+            <div className="input-container">
+            <label htmlFor="longitudeInput">Longitude:</label>
+              <input
+                type="number"
+                name="text"
+                className="input"
+                placeholder="Latitude"
+                value={inputLatitude}
+                onChange={(e) => setInputLatitude(e.target.value)}
+              />
+            </div>
+            <button className="btn" onClick={(e)=>{e.preventDefault(); handleGetInfos(); setShowLeafletMap(true);}}>
             Get Infos
           </button>
+          </div>
+          
+          
         </form>
       </div>
     </div>
