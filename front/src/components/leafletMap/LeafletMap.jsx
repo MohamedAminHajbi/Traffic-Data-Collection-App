@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-const LeafletMap = ({ flowData }) => {
-  const convertFlowSegmentData = (flowData) => {
-    const coordinates = flowData?.flowSegmentData?.coordinates?.coordinate;
+const LeafletMap = ({ dataRouting }) => {
+  const convertFlowSegmentData = (dataRouting) => {
+    const coordinates = dataRouting?.routes[0].legs[0].points;
     const convertedCoordinates = coordinates
       ? coordinates.map((coord) => [coord.latitude, coord.longitude])
       : [];
@@ -12,7 +12,7 @@ const LeafletMap = ({ flowData }) => {
   };
 
   useEffect(() => {
-    const convertedCoordinates = convertFlowSegmentData(flowData);
+    const convertedCoordinates = convertFlowSegmentData(dataRouting);
 
     if (convertedCoordinates.length === 0) {
       // Data is not available, do not render the map
@@ -40,52 +40,11 @@ const LeafletMap = ({ flowData }) => {
     return () => {
       map.remove();
     };
-  }, [flowData
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  ]);
+  }, [dataRouting]);
 
   return (
     <div>
-      <div id="leaflet-map" style={{ height: '500px' }}></div>
+      <div id="leaflet-map" style={{ height: '100vh' }}></div>
     </div>
   );
 };

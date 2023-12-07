@@ -1,5 +1,3 @@
-// Map.js
-
 import React, { useState, useEffect, useRef } from 'react';
 import '@tomtom-international/web-sdk-maps/dist/maps.css';
 import tt from '@tomtom-international/web-sdk-maps';
@@ -57,6 +55,19 @@ function Map() {
       console.log("Our Data",flowData)
     } catch (error) {
       console.error('Error fetching data:', error);
+    }
+  };
+  const handleGetRouting = async (e) => {
+  
+    try {
+      const response = await fetch(
+        `https://api.tomtom.com/routing/1/calculateRoute/${startLtd},${startLng}:${endLtd},${endLng}/json?key=LV0YAdniBN99sBdObDGUaPGalGmpRu4R`
+      );
+      const dataRouting = await response.json();
+      setRouteData(dataRouting);
+
+    } catch (error) {
+      console.error('Error fetching route data:', error);
     }
   };
 
@@ -130,8 +141,6 @@ function Map() {
           }
           return newMarker;
         });
-      
-      
           console.log(`Clicked at coordinates: ${lng}, ${lat}`);
           setInputLatitude(lat);
           setInputLongitude(lng);
@@ -140,9 +149,6 @@ function Map() {
         
       });
     }
-    
-
-    
 
     const geoControl = new tt.GeolocateControl({
       positionOptions: {
@@ -159,8 +165,6 @@ function Map() {
       console.log(`Current location: ${lat}, ${lng}`);
       setMyLongitude(lng);
       setMyLatitude(lat);
-      localStorage.setItem('mylat', myLatitude);
-      localStorage.setItem('mylng', myLongitude);
     });
 
     mapInstance.addControl(geoControl, 'top-left');
@@ -177,16 +181,7 @@ function Map() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await fetch(
-          `https://api.tomtom.com/routing/1/calculateRoute/${startLtd},${startLng}:${endLtd},${endLng}/json?key=LV0YAdniBN99sBdObDGUaPGalGmpRu4R`
-        );
-        const dataRouting = await response.json();
-        setRouteData(dataRouting);
-
-      } catch (error) {
-        console.error('Error fetching route data:', error);
-      }
+      
     };
 
     fetchData();
@@ -198,15 +193,14 @@ function Map() {
       {showLeafletMap ? (
         <div>
           <div style={{ display: 'block' }}>
-            <LeafletMap flowData={flowData} />
+            <LeafletMap dataRouting={routeData} />
           </div>
           <div style={{ display: 'none' }} ref={mapElement} className="mapDiv"></div>
         </div>
-          
         ) : (
           <div>
           <div style={{ display: 'none' }}>
-            <LeafletMap flowData={flowData} />
+            <LeafletMap dataRouting={routeData} />
           </div>
             <div style={{ display: 'block' }} ref={mapElement} className="mapDiv"></div>
         </div>
@@ -224,29 +218,29 @@ function Map() {
                 placeholder="search..."
               />
               <span className="icon">
-                
+               
               </span>
             </div> */}
             <div className="input-container">
-            <label htmlFor="longitudeInput">Longitude:</label>
+            <label htmlFor="longitudeInput">Start Point Longitude:</label>
               <input
                 type="number"
                 name="text"
                 className="input"
                 placeholder="Longitude"
                 value={inputLongitude}
-                onChange={(e) => setInputLongitude(e.target.value)}
+                onChange={(e) => setStartLng(e.target.value)}
               />
             </div>
             <div className="input-container">
-            <label htmlFor="longitudeInput">Longitude:</label>
+            <label htmlFor="longitudeInput">Start Point Latitude:</label>
               <input
                 type="number"
                 name="text"
                 className="input"
                 placeholder="Latitude"
                 value={inputLatitude}
-                onChange={(e) => setInputLatitude(e.target.value)}
+                onChange={(e) => setStartLtd(e.target.value)}
               />
             </div>
             <button className="btn" onClick={(e)=>{e.preventDefault(); handleGetInfos(); setShowLeafletMap(true);}}>
@@ -255,28 +249,28 @@ function Map() {
           </div>
           <div className="inputs">
           <div className="input-container">
-          <label htmlFor="longitudeInput">Longitude:</label>
+          <label htmlFor="longitudeInput">End point Longitude:</label>
               <input
                 type="number"
                 name="text"
                 className="input"
                 placeholder="Longitude"
                 value={inputLongitude}
-                onChange={(e) => setInputLongitude(e.target.value)}
+                onChange={(e) => setEndLng(e.target.value)}
               />
             </div>
             <div className="input-container">
-            <label htmlFor="longitudeInput">Longitude:</label>
+            <label htmlFor="longitudeInput">End Point Latitude:</label>
               <input
                 type="number"
                 name="text"
                 className="input"
                 placeholder="Latitude"
                 value={inputLatitude}
-                onChange={(e) => setInputLatitude(e.target.value)}
+                onChange={(e) => setEndLtd(e.target.value)}
               />
             </div>
-            <button className="btn" onClick={(e)=>{e.preventDefault(); handleGetInfos(); setShowLeafletMap(true);}}>
+            <button className="btn" onClick={(e)=>{e.preventDefault(); handleGetRouting(); setShowLeafletMap(true);}}>
             Get Infos
           </button>
           </div>

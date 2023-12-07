@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-const TrafficMap = () => {
+const TrafficMap = (props) => {
 
   const convertFlowSegmentData = (data) => {
     const coordinates = data.routes[0].legs[0].points;
