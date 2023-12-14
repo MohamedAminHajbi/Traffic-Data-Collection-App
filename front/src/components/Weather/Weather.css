@@ -1,0 +1,125 @@
+.mapweather{
+    width: 50%;
+    height: 100vh;
+}
+.mapDivWeather{
+    width: 100%;
+    height: 100vh;
+}
+.weatherContainer{
+    display: flex;
+    height: 100vh;
+}
+.weather-info{
+    width: 50%;
+    padding: 50px;
+}
+
+  .showAQI{
+    margin-right: 10px;
+    color: black;
+    letter-spacing: 1px;
+  }
+
+
+  .containerCheck {
+    cursor: pointer;
+  }
+  
+  .containerCheck input {
+    display: none;
+  }
+  
+  .containerCheck svg {
+    overflow: visible;
+  }
+  
+  .path {
+    fill: none;
+    stroke: #0B2447;
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease;
+    stroke-dasharray: 241 9999999;
+    stroke-dashoffset: 0;
+  }
+  
+  .containerCheck input:checked ~ svg .path {
+    stroke-dasharray: 70.5096664428711 9999999;
+    stroke-dashoffset: -262.2723388671875;
+  }
+  
+  .weatherInfo{
+    padding: 20px;
+    align-items: center;
+  }
+  .location{
+    padding-right: 20px;
+     color: black;
+     letter-spacing: 1px;
+  }
+
+    table{
+        z-index: 2;
+        left: 50%;
+        top: 50%;
+        
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(32, 32, 32, 3);
+        background: #fafafa;
+        text-align: center;
+    }
+    th,td{
+        padding: 12px 12px !important; 
+    }
+
+    th {
+        background: #0B2447 !important;
+        color: #fafafa !important;
+        text-transform: uppercase !important;
+      }
+    
+    
+
+
+      .card {
+        width: 600px;
+        height: 254px;
+        background-color: #fff5;
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        padding: 12px;
+        gap: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-bottom: 40px;
+      }
+      
+      
+      
+      
+      
+      .heading {
+        font-size: 20px;
+        text-transform: capitalize;
+        font-weight: 700;
+      }
+      
+      
+      
+      .card:hover::after {
+        filter: blur(30px);
+      }
+      
+      .card:hover::before {
+        transform: rotate(-180deg) scaleX(1.01) scaleY(1.01);
+      }
+      
+      .mybtn{
+        transform: translate(115%, 20%);
+      }

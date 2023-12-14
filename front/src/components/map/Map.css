@@ -1,24 +1,28 @@
-.container {
+.containermap {
   display: flex;
+  height: 100vh;
 }
 
 .mapContainer {
   width: 50%;
-  position: fixed;
+  height: 100vh;
   top: 0;
   bottom: 0;
   left: 0;
 }
 
 .mapDiv {
-  height: 100%;
+  height: 100vh;
+
 }
 
 .rightPanel {
   width: 50%;
-  margin-left: 50%;
   padding: 20px;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 
 /* Add your other styles as needed */
@@ -27,7 +31,7 @@
 .mapDiv {
   height: 100vh; /* Set a specific height for the map */
 }
-.btn {
+.btncustom {
     font-size: 17px;
     background: transparent;
     border: none;
@@ -39,7 +43,7 @@
     text-decoration: none;
   }
   
-  .btn::before {
+  .btncustom::before {
     content: '';
     position: absolute;
     left: 0;
@@ -50,16 +54,16 @@
     transition: .3s ease;
   }
   
-  .btn:hover {
+  .btncustom:hover {
     color: #fff;
     transition-delay: .3s;
   }
   
-  .btn:hover::before {
+  .btncustom:hover::before {
     width: 100%;
   }
   
-  .btn::after {
+  .btncustom::after {
     content: '';
     position: absolute;
     left: 0;
@@ -71,7 +75,7 @@
     z-index: -1;
   }
   
-  .btn:hover::after {
+  .btncustom:hover::after {
     height: 100%;
     transition-delay: 0.3s;
     color: aliceblue;
@@ -98,7 +102,7 @@
     border: 2.5px solid black;
     text-transform: uppercase;
     letter-spacing: 2px;
-    margin-top: 10px;
+    
   }
 
   .inputs{
@@ -214,3 +218,219 @@
     
     
   }
+
+
+
+
+  .toggle-container {
+    --active-color: #0B2447;
+    --inactive-color: #d3d3d6;
+    position: relative;
+    aspect-ratio: 292 / 142;
+    height: 1.875em;
+  }
+  
+  .toggle-input {
+    appearance: none;
+    margin: 0;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+  
+  .toggle {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  
+  .toggle-background {
+    fill: var(--inactive-color);
+    transition: fill .4s;
+  }
+  
+  .toggle-input:checked + .toggle .toggle-background {
+    fill: var(--active-color);
+  }
+  
+  .toggle-circle-center {
+    transform-origin: center;
+    transition: transform .6s;
+  }
+  
+  .toggle-input:checked + .toggle .toggle-circle-center {
+    transform: translateX(150px);
+  }
+  
+  .toggle-circle {
+    transform-origin: center;
+    transition: transform .45s;
+    backface-visibility: hidden;
+  }
+  
+  .toggle-circle.left {
+    transform: scale(1);
+  }
+  
+  .toggle-input:checked + .toggle .toggle-circle.left {
+    transform: scale(0);
+  }
+  
+  .toggle-circle.right {
+    transform: scale(0);
+  }
+  
+  .toggle-input:checked + .toggle .toggle-circle.right {
+    transform: scale(1);
+  }
+  
+  .toggle-icon {
+    transition: fill .4s;
+  }
+  
+  .toggle-icon.on {
+    fill: var(--inactive-color);
+  }
+  
+  .toggle-input:checked + .toggle .toggle-icon.on {
+    fill: #fff;
+  }
+  
+  .toggle-icon.off {
+    fill: #eaeaec;
+  }
+  
+  .toggle-input:checked + .toggle .toggle-icon.off {
+    fill: var(--active-color);
+  }
+
+
+
+  body.active-modal {
+    overflow-y: hidden;
+    
+}
+
+.modalcard, .overlaycard {
+    width: 100%;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+    
+}
+.modalcard{
+  z-index: 99;
+}
+
+.overlaycard {
+
+    background: rgba(49,49,49,0.8);
+    
+}
+.modal-content-card {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1.4;
+    background: #f1f1f1;
+    
+    padding: 14px 28px;
+    border-radius: 3px;
+    max-width: 600px;
+    min-width: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.modal-content-card p{
+  font-size: 30px;
+  text-align: center;
+}
+.modal-content-card p{
+  font-size: 30px;
+  text-align: center;
+}
+
+
+
+
+.button {
+  --main-focus: #2d8cf0;
+  --font-color: #dedede;
+  --bg-color-sub: #0B2447;
+  --bg-color: #0B2441;
+  --main-color: #dedede;
+  position: relative;
+  width: 150px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border: 2px solid var(--main-color);
+  box-shadow: 4px 4px var(--main-color);
+  background-color: var(--bg-color);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.button, .button__icon, .button__text {
+  transition: all 0.3s;
+}
+
+.button .button__text {
+  transform: translateX(33px);
+  color: var(--font-color);
+  font-weight: 600;
+}
+
+.button .button__icon {
+  position: absolute;
+  transform: translateX(109px);
+  height: 100%;
+  width: 39px;
+  background-color: var(--bg-color-sub);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button .svg {
+  width: 20px;
+  fill: var(--main-color);
+}
+
+.button:hover {
+  background: var(--bg-color);
+}
+
+.button:hover .button__text {
+  color: transparent;
+}
+
+.button:hover .button__icon {
+  width: 148px;
+  transform: translateX(0);
+}
+
+.button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px var(--main-color);
+}
+
+.btns-container{
+  display: flex;
+  align-items: center;
+  gap: 62px;
+}
+.table-route{
+  margin-top: 20px;
+}

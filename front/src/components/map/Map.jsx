@@ -7,7 +7,7 @@ import LeafletMap from '../leafletMap/LeafletMap';
 
 function Map() {
   const mapElement = useRef();
-  const navigate = useNavigate();
+  const [showTomTomMap, setShowTomTomMap] = useState(true);
   const [myLongitude, setMyLongitude] = useState('10.155951734199805');
   const [myLatitude, setMyLatitude] = useState('36.84419289085466');
   const [mapZoom, setMapZoom] = useState(1);
@@ -24,8 +24,18 @@ function Map() {
   const [routeData, setRouteData] = useState(null);
   const [showLeafletMap, setShowLeafletMap] = useState(false);
   const [pingTwoPlaces, setPingTwoPlaces] = useState(true);
-  const [clickCount, setClickCount] = useState(0);
   const [markers, setMarkers] = useState([]);
+  const [modal, setModal] = useState(false);
+  const [routingInfo, setRoutingInfo] = useState(null);
+
+
+  const toggleModal = () => {
+    setModal(!modal);
+  }
+
+  const handleRefresh = () => {
+    setShowTomTomMap(true);
+  };
 
 
   const convertFlowSegmentData = (flowData) => {
@@ -34,40 +44,69 @@ function Map() {
     return convertedCoordinates;
   };
 
-  const handleGetInfos = async (e) => {
-  
-    try {
-      const response = await fetch(
-        `https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json?key=LV0YAdniBN99sBdObDGUaPGalGmpRu4R&point=${inputLatitude},${inputLongitude}`
-      );
+  const formatRoutingInfo = (info) => {
+    const formattedInfo = { ...info };
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
-      }
+    // Format travel time to hours and minutes
+    const hours = Math.floor(formattedInfo.summary.travelTimeInSeconds / 3600);
+    const minutes = Math.floor((formattedInfo.summary.travelTimeInSeconds % 3600) / 60);
+    formattedInfo.summary.travelTimeInSeconds = `${hours}h ${minutes}m`;
 
-      const data = await response.json();
-      setFlowData(data);
-      setShowLeafletMap(true);
+    // Format departure and arrival times
+    formattedInfo.summary.departureTime = new Date(formattedInfo.summary.departureTime).toLocaleString();
+    formattedInfo.summary.arrivalTime = new Date(formattedInfo.summary.arrivalTime).toLocaleString();
 
-      const convertedCoordinates = convertFlowSegmentData(data);
-      setRoadCordinates(convertedCoordinates);
-      
-      console.log("Our Data",flowData)
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
+    return formattedInfo;
   };
+
+  const togglePingTwoPlaces = () => {
+    setPingTwoPlaces((prevValue) => !prevValue);
+  };
+
   const handleGetRouting = async (e) => {
-  
     try {
       const response = await fetch(
         `https://api.tomtom.com/routing/1/calculateRoute/${startLtd},${startLng}:${endLtd},${endLng}/json?key=LV0YAdniBN99sBdObDGUaPGalGmpRu4R`
       );
+  
+      if (!response.ok || response.status < 200) {
+        throw new Error('Failed to fetch route data');
+      }
+      if(response.ok){
+        setShowLeafletMap(true);
+      }
+  
       const dataRouting = await response.json();
       setRouteData(dataRouting);
-
+      console.log(dataRouting)
+      const hours = Math.floor(dataRouting.routes[0].summary.travelTimeInSeconds / 3600);
+      const minutes = Math.floor((dataRouting.routes[0].summary.travelTimeInSeconds % 3600) / 60);
+      dataRouting.routes[0].summary.travelTimeInSeconds = `${hours}h ${minutes}m`;
+      const arrivalTime = new Date(dataRouting.routes[0].summary.arrivalTime).toLocaleString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      });
+      dataRouting.routes[0].summary.arrivalTime = arrivalTime.replace(',', '');
+      const departureTime = new Date(dataRouting.routes[0].summary.departureTime).toLocaleString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      });
+      const lengthInKilometers = (dataRouting.routes[0].summary.lengthInMeters / 1000).toFixed(2);
+      dataRouting.routes[0].summary.lengthInMeters = `${lengthInKilometers} km`;
+      dataRouting.routes[0].summary.departureTime = departureTime.replace(',', '');
     } catch (error) {
       console.error('Error fetching route data:', error);
+      toggleModal()
     }
   };
 
@@ -142,10 +181,9 @@ function Map() {
           return newMarker;
         });
           console.log(`Clicked at coordinates: ${lng}, ${lat}`);
-          setInputLatitude(lat);
-          setInputLongitude(lng);
-          localStorage.setItem('inputLat', inputLatitude);
-          localStorage.setItem('inputLng', inputLongitude);
+          setEndLtd(lat);
+          setEndLng(lng);
+
         
       });
     }
@@ -165,6 +203,8 @@ function Map() {
       console.log(`Current location: ${lat}, ${lng}`);
       setMyLongitude(lng);
       setMyLatitude(lat);
+      setStartLng(lng)
+      setStartLtd(lat)
     });
 
     mapInstance.addControl(geoControl, 'top-left');
@@ -176,8 +216,13 @@ function Map() {
       if (marker) {
         marker.remove();
       }
+      if (markers.length>0) {
+        markers.forEach((m)=>{
+          m.remove();
+        })
+      }
     };
-  }, []);
+  }, [pingTwoPlaces]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -188,7 +233,7 @@ function Map() {
   }, []);
 
   return (
-    <div className="container">
+    <div className="containermap">
       <div className="mapContainer">
       {showLeafletMap ? (
         <div>
@@ -208,6 +253,30 @@ function Map() {
       </div>
 
       <div className="rightPanel">
+        <div className="btns-container">
+            <div className="toggle-container">
+          <input type="checkbox" className="toggle-input" onClick={(e)=>togglePingTwoPlaces()}/>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 292 142" className="toggle">
+            <path d="M71 142C31.7878 142 0 110.212 0 71C0 31.7878 31.7878 0 71 0C110.212 0 119 30 146 30C173 30 182 0 221 0C260 0 292 31.7878 292 71C292 110.212 260.212 142 221 142C181.788 142 173 112 146 112C119 112 110.212 142 71 142Z" className="toggle-background"></path>
+            <rect rx="6" height="64" width="12" y="39" x="64" className="toggle-icon on"></rect>
+            <path d="M221 91C232.046 91 241 82.0457 241 71C241 59.9543 232.046 51 221 51C209.954 51 201 59.9543 201 71C201 82.0457 209.954 91 221 91ZM221 103C238.673 103 253 88.6731 253 71C253 53.3269 238.673 39 221 39C203.327 39 189 53.3269 189 71C189 88.6731 203.327 103 221 103Z" fillRule="evenodd" className="toggle-icon off"></path>
+            <g filter="url('#goo')">
+              <rect fill="#fff" rx="29" height="58" width="116" y="42" x="13" className="toggle-circle-center"></rect>
+              <rect fill="#fff" rx="58" height="114" width="114" y="14" x="14" className="toggle-circle left"></rect>
+              <rect fill="#fff" rx="58" height="114" width="114" y="14" x="164" className="toggle-circle right"></rect>
+            </g>
+            <filter id="goo">
+              <feGaussianBlur stdDeviation="10" result="blur" in="SourceGraphic"></feGaussianBlur>
+              <feColorMatrix result="goo" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" mode="matrix" in="blur"></feColorMatrix>
+            </filter>
+          </svg>
+        </div>
+        <button type="button" className="button" onClick={(e)=>{e.preventDefault();setShowLeafletMap(false);}}>
+          <span className="button__text">Refresh</span>
+          <span className="button__icon"><svg className="svg" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M35.3 12.7c-2.89-2.9-6.88-4.7-11.3-4.7-8.84 0-15.98 7.16-15.98 16s7.14 16 15.98 16c7.45 0 13.69-5.1 15.46-12h-4.16c-1.65 4.66-6.07 8-11.3 8-6.63 0-12-5.37-12-12s5.37-12 12-12c3.31 0 6.28 1.38 8.45 3.55l-6.45 6.45h14v-14l-4.7 4.7z"></path><path d="M0 0h48v48h-48z" fill="none"></path></svg></span>
+        </button>
+        </div>
+      
         <form className="form-infos">
           <div className="inputs">
             {/* <div className="input-container">
@@ -228,7 +297,7 @@ function Map() {
                 name="text"
                 className="input"
                 placeholder="Longitude"
-                value={inputLongitude}
+                value={startLng}
                 onChange={(e) => setStartLng(e.target.value)}
               />
             </div>
@@ -239,13 +308,10 @@ function Map() {
                 name="text"
                 className="input"
                 placeholder="Latitude"
-                value={inputLatitude}
+                value={startLtd}
                 onChange={(e) => setStartLtd(e.target.value)}
               />
             </div>
-            <button className="btn" onClick={(e)=>{e.preventDefault(); handleGetInfos(); setShowLeafletMap(true);}}>
-            Get Traffic
-          </button>
           </div>
           <div className="inputs">
           <div className="input-container">
@@ -255,7 +321,7 @@ function Map() {
                 name="text"
                 className="input"
                 placeholder="Longitude"
-                value={inputLongitude}
+                value={endLng}
                 onChange={(e) => setEndLng(e.target.value)}
               />
             </div>
@@ -266,18 +332,56 @@ function Map() {
                 name="text"
                 className="input"
                 placeholder="Latitude"
-                value={inputLatitude}
+                value={endLtd}
                 onChange={(e) => setEndLtd(e.target.value)}
               />
             </div>
-            <button className="btn" onClick={(e)=>{e.preventDefault(); handleGetRouting(); setShowLeafletMap(true);}}>
-            Get Infos
-          </button>
+            
           </div>
-          
-          
         </form>
+        <button className="btncustom" onClick={(e)=>{e.preventDefault(); handleGetRouting();}}>
+            Get Routing
+        </button>
+        {routeData && (
+        <div className="table-route">
+            <div className="filter"></div>
+            <table>
+              <tr>
+                <th>Route Length:</th>
+                <th>Travel Time:</th>
+                <th>departure Time:</th>
+                <th>arrival Time:</th>
+                
+              </tr>
+              <tr>
+                <td>
+                  {routeData.routes[0].summary.lengthInMeters}
+                </td>
+                <td>{routeData.routes[0].summary.travelTimeInSeconds}</td>
+                <td>
+                {routeData.routes[0].summary.departureTime}
+                </td>
+                <td>{routeData.routes[0].summary.arrivalTime}</td>
+                
+              </tr>
+            </table>
+          </div>)}
       </div>
+      {modal && (
+        <div className="modalcard">
+          <div className="overlaycard"></div>
+          <div className="modal-content-card">
+            <h2>Error</h2>
+            <p>We are sorry that we can't find a route to this location!</p>
+            <button className="btncustom" onClick={(e)=>{e.preventDefault(); toggleModal();}}>
+              Return
+            </button>
+          </div>
+      </div>
+      )
+
+      }
+      
     </div>
   );
 }
