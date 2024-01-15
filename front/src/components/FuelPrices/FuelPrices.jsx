@@ -1,75 +1,55 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 
-const FuelPrices = () => {
-  const [fuelPrices, setFuelPrices] = useState(null);
+function FuelStations() {
+  const [stations, setStations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const url = 'http://localhost:8000/fuel-service?wsdl';
-
-      // Construct SOAP envelope
-      const soapEnvelope = `
-  <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" \
-    xmlns:web="http://example.com/fuel"> \
-    <soapenv:Header/> \
-    <soapenv:Body> \
-      <web:getFuelPricesRequest/> \
-    </soapenv:Body> \
-  </soapenv:Envelope>`;
 
 
-      try {
-        const response = await axios.post(url, soapEnvelope, {
-          headers: {
-            'Content-Type': 'text/xml',
-          },
-        });
-      
-        if (response && response.data) {
-          // Parse the XML response
-          const parser = new DOMParser();
-          const xmlDoc = parser.parseFromString(response.data, 'text/xml');
-      
-          // Check if the fuelPrices element exists
-          const fuelPricesElement = xmlDoc.getElementsByTagName('fuelPrices')[0];
-      
-          if (fuelPricesElement) {
-            // Extract data from the XML response
-            const fuelPricesData = fuelPricesElement.textContent;
-      
-            // Assuming fuelPricesData is an array, you might need to adjust this based on your XML structure
-            setFuelPrices(fuelPricesData.split(',')); // Split the data into an array
-            console.log('Received XML Response:', response.data);
-          } else {
-            console.error('Missing fuelPrices element in the XML response:', response.data);
-          }
-        } else {
-          console.error('Empty or undefined response:', response);
-        }
-      } catch (error) {
-        console.error('SOAP request error:', error.response ? error.response.data : error.message);
-      }
-      
-      
+const options = {
+  method: 'POST',
+  url: 'https://number-conversion-service.p.rapidapi.com/webservicesserver/NumberConversion.wso',
+  headers: {
+    'content-type': 'application/xml',
+    'X-RapidAPI-Key': '337be770f6msh0993e58fecbc1e3p13ec72jsndf7500c4098b',
+    'X-RapidAPI-Host': 'number-conversion-service.p.rapidapi.com'
+  },
+  data: '<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<soap:Envelope xmlns:soap=\'http://schemas.xmlsoap.org/soap/envelope/\'>\n  <soap:Body>\n    <NumberToWords xmlns=\'http://www.dataaccess.com/webservicesserver/\'>\n      <ubiNum>4815</ubiNum>\n    </NumberToWords>\n  </soap:Body>\n</soap:Envelope>'
+};
+
+try {
+	const response = await axios.request(options);
+	console.log(response.data);
+} catch (error) {
+	console.error(error);
+}
     };
 
     fetchData();
-  }, []); // The empty dependency array ensures the effect runs only once
+  }, []); // Empty dependency array ensures that this effect runs once when the component mounts
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   return (
     <div>
-      {fuelPrices ? (
-        <ul>
-          {fuelPrices.map((price, index) => (
-            <li key={index}>{price}</li>
-          ))}
-        </ul>
-      ) : (
-        <p>Loading...</p>
-      )}
+      <h1>Fuel Stations</h1>
+      <ul>
+        {stations.map((station) => (
+          <li key={station.id}>{station.name}</li>
+        ))}
+      </ul>
     </div>
   );
-};
+}
 
-export default FuelPrices;
+export default FuelStations;

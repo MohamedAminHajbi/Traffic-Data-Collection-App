@@ -2,17 +2,22 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Home.css';
 import image from '../../assets/8261.jpg';
+import ParticlesContainer from '../Particles/ParticlesConatiner';
 
 const Home = () => {
   return (
     <div>
+      
       <header className="masthead">
-        <div className="container px-5">
+      <ParticlesContainer/>
+        <div className="container px-5 z-index-99">
           <div className="row gx-5 align-items-center">
-            <div className="col-lg-6">
-              <div className="mb-5 mb-lg-0 text-center text-lg-start">
+            <div className="firstpart col-lg-6">
+            
+              <div className="mb-5 pt-5 mt-4 mb-lg-0 text-center text-lg-start">
                 <h1 className="display-1 lh-1 mb-3">Navigate Efficiently, Avoid Traffic Hassles.</h1>
                 <p className="lead fw-normal text-muted mb-5">
+                  
                   Simplify your commute and reach your destination faster with our app. Say goodbye to traffic headaches!
                 </p>
               </div>

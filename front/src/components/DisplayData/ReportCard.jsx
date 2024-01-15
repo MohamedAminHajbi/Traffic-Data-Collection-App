@@ -1,19 +1,22 @@
 import React from 'react'
+import "./Card.css"
 
 const ReportCard = (props) => {
   console.log(props.data.username)
   return (
     <div>
-    <div class="card border-secondary mb-3 " style={{"width": "1000px"}}>
-    <div class="card-header d-flex justify-content-between ">
-      <h5 className=''>{props.data.username}</h5>
-      <h5 className='fs-6 p-2'>{props.data.email}</h5>
-      </div>
-    <div class="card-body text-secondary">
-      <h5 class="card-title ">{props.data.dateT}</h5>
-      <p class="card-text ">{props.data.message}</p>
+    <div class="notification">
+    <div class="notiglow"></div>
+    <div class="notiborderglow"></div>
+    <div className='d-flex justify-content-between'>
+    <div class="notititle" style={{fontSize:'26px'}}>{props.data.username}</div>
+    <div class="notititle me-4">{props.data.localisation}</div>
+    <div class="notititle me-4">{props.data.email}</div>
     </div>
-  </div></div>
+    <div class="notibody">{props.data.message}</div>
+    <div class="notibody">{props.data.dateT}</div>
+  </div>
+  </div>
   )
 }
 
